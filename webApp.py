@@ -120,7 +120,7 @@ def success():
 				output.close()
 				img = filename
 
-				res = pred(img)
+				res = pred(img_path)
 
 				#class_result , prob_result = predict(img_path , model)
 
@@ -150,7 +150,7 @@ def success():
 				file.save(os.path.join(target_img , file.filename))
 				img_path = os.path.join(target_img , file.filename)
 				img = file.filename
-				res = pred(img)
+				res = pred(img_path)
 
 				#class_result , prob_result = predict(img_path , model)
 			#really nigga.
