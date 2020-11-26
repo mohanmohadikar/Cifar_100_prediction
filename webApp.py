@@ -121,7 +121,7 @@ def success():
 				output.close()
 				#img = filename
 				print("111111")
-				img = Image.open(BytesIO(img_path))
+				img = Image.open(BytesIO(output))
 				print("222222")
 				res = pred(img)
 				print(res)
