@@ -119,12 +119,9 @@ def success():
 				output = open(img_path , "wb")
 				output.write(resource.read())
 				output.close()
-				#img = filename
-				print("111111")
-				img = Image.open(BytesIO(resource))
-				print("222222")
+				img = filename
+
 				res = pred(img)
-				print(res)
 
 				#class_result , prob_result = predict(img_path , model)
 
@@ -153,12 +150,9 @@ def success():
 			if file and allowed_file(file.filename):
 				file.save(os.path.join(target_img , file.filename))
 				img_path = os.path.join(target_img , file.filename)
-				#img = file.filename
-				print("111111")
-				img = Image.open(BytesIO(img_path))
-				print("222222")
+				img = file.filename
+				img = Image.open(BytesIO(img))
 				res = pred(img)
-				print(res)
 
 				#class_result , prob_result = predict(img_path , model)
 			#really nigga.
