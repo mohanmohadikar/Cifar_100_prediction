@@ -32,11 +32,10 @@ from tensorflow.keras.preprocessing.image import load_img , img_to_array
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 #model = load_model(os.path.join(BASE_DIR , 'ModelWebApp.hdf5'))
-model = load_model(os.path.join(BASE_DIR , 'cifar_100_cnn.h5'))
-#model = load_model("static/model.h5")
-#joblib_file = open("static/tokenizer.p", "rb")
+model = load_model("static/model.h5")
+joblib_file = open("static/tokenizer.p", "rb")
 # Load from file
-#tokenizer = pickle.load(joblib_file)
+tokenizer = pickle.load(joblib_file)
 
 
 ALLOWED_EXT = set(['jpg' , 'jpeg' , 'png' , 'jfif'])
@@ -44,29 +43,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXT
 
-#classes = ['airplane' ,'automobile', 'bird' , 'cat' , 'deer' ,'dog' ,'frog', 'horse' ,'ship' ,'truck']
-classes = [
-		'beaver', 'dolphin', 'otter', 'seal', 'whale',
-		'aquarium fish', 'flatfish', 'ray', 'shark', 'trout',
-		'orchids', 'poppies', 'roses', 'sunflowers', 'tulips',
-		'bottles', 'bowls', 'cans', 'cups', 'plates',
-		'apples', 'mushrooms', 'oranges', 'pears', 'sweet peppers',
-		'clock', 'computer keyboard', 'lamp', 'telephone', 'television',
-		'bed', 'chair', 'couch', 'table', 'wardrobe',
-		'bee', 'beetle', 'butterfly', 'caterpillar', 'cockroach',
-		'bear', 'leopard', 'lion', 'tiger', 'wolf',
-		'bridge', 'castle', 'house', 'road', 'skyscraper',
-		'cloud', 'forest', 'mountain', 'plain', 'sea',
-		'camel', 'cattle', 'chimpanzee', 'elephant', 'kangaroo',
-		'fox', 'porcupine', 'possum', 'raccoon', 'skunk',
-		'crab', 'lobster', 'snail', 'spider', 'worm',
-		'baby', 'boy', 'girl', 'man', 'woman',
-		'crocodile', 'dinosaur', 'lizard', 'snake', 'turtle',
-		'hamster', 'mouse', 'rabbit', 'shrew', 'squirrel',
-		'maple', 'oak', 'palm', 'pine', 'willow',
-		'bicycle', 'bus', 'motorcycle', 'pickup' 'truck', 'train',
-		'lawn-mower', 'rocket', 'streetcar', 'tank', 'tractor'
-		]
+classes = ['airplane' ,'automobile', 'bird' , 'cat' , 'deer' ,'dog' ,'frog', 'horse' ,'ship' ,'truck']
 
 
 def predict(filename , model):
@@ -179,30 +156,60 @@ def success():
 
 
 
-# load and prepare the image
-def load_image(filename):
-	# load the image
-   img = filename.resize((32,32))
-	# convert to array
-   img = img_to_array(img)
-	# reshape into a single sample with 3 channels
-   img = img.reshape(1, 32, 32, 3)
-	# prepare pixel data
-   img = img.astype('float32')
-   img = img / 255.0
-   return img
- 
-# load an image and predict the class
-def pred(img_file):
-	# load the image
-	img = load_image(img_file)
-	# load model
-	#model = load_model('final_model.h5')
-	# predict the class
-	result = model.predict_classes(img)
-	return classes[result[0]-1]
- 
-# entry point, run the example
+def extract_features(filename, model):
+    try:
+        image = Image.open(filename)
+            
+    except:
+        print("ERROR: Couldn't open image! Make sure the image path and extension is correct")
+    image = image.resize((299,299))
+    image = np.array(image)
+    # for images that has 4 channels, we convert them into 3 channels
+    if image.shape[2] == 4: 
+        image = image[..., :3]
+    image = np.expand_dims(image, axis=0)
+    image = image/127.5
+    image = image - 1.0
+    feature = model.predict(image)
+    return feature
+
+def word_for_id(integer, tokenizer):
+ 	for word, index in tokenizer.word_index.items():
+    	 if index == integer:
+        	return word
+ 	return None
+
+
+def generate_desc(model, tokenizer, photo, max_length):
+    in_text = 'start'
+    for i in range(max_length):
+        sequence = tokenizer.texts_to_sequences([in_text])[0]
+        sequence = pad_sequences([sequence], maxlen=max_length)
+        pred = model.predict([photo,sequence], verbose=0)
+        pred = np.argmax(pred)
+        word = word_for_id(pred, tokenizer)
+        if word is None:
+            break
+        in_text += ' ' + word
+        if word == 'end':
+            break
+    return in_text
+
+
+def pred(img_path):
+	max_length = 32
+#	tokenizer = pickle.load(open("static/tokenizer.p","rb"))
+#	model = load_model(os.path.join(BASE_DIR , 'model.h5'))
+	#model = load_model('models/model_9.h5')
+	xception_model = Xception(include_top=False, pooling="avg")
+
+	photo = extract_features(img_path, xception_model)
+	img = Image.open(img_path)
+
+	description = generate_desc(model, tokenizer, photo, max_length)
+	return description
+
+
 
 
 if __name__ == "__main__":
