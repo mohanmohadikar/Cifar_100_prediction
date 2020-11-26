@@ -17,6 +17,7 @@ import os
 import uuid
 import flask
 import urllib
+from io import BytesIO
 from PIL import Image
 import numpy as np
 import tensorflow as tf
@@ -149,7 +150,8 @@ def success():
 			if file and allowed_file(file.filename):
 				file.save(os.path.join(target_img , file.filename))
 				img_path = os.path.join(target_img , file.filename)
-				img = file.filename
+				#img = file.filename
+				img = Image.open(BytesIO(img_path))
 				res = pred(img)
 
 				#class_result , prob_result = predict(img_path , model)
