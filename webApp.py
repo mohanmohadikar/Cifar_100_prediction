@@ -31,8 +31,8 @@ from tensorflow.keras.preprocessing.image import load_img , img_to_array
 
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-model = load_model(os.path.join(BASE_DIR , 'ModelWebApp.hdf5'))
-model = load_model(os.path.join(BASE_DIR , 'cifar_100_cnn.hdf5'))
+#model = load_model(os.path.join(BASE_DIR , 'ModelWebApp.hdf5'))
+model = load_model(os.path.join(BASE_DIR , 'cifar_100_cnn.h5'))
 #model = load_model("static/model.h5")
 #joblib_file = open("static/tokenizer.p", "rb")
 # Load from file
@@ -119,7 +119,7 @@ def success():
 				output.close()
 				img = filename
 
-				res = pred(img_path)
+				res = pred(img)
 
 				#class_result , prob_result = predict(img_path , model)
 
@@ -149,7 +149,7 @@ def success():
 				file.save(os.path.join(target_img , file.filename))
 				img_path = os.path.join(target_img , file.filename)
 				img = file.filename
-				res = pred(img_path)
+				res = pred(img)
 
 				#class_result , prob_result = predict(img_path , model)
 			#really nigga.
