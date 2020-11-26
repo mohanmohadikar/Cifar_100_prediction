@@ -151,7 +151,7 @@ def success():
 				file.save(os.path.join(target_img , file.filename))
 				img_path = os.path.join(target_img , file.filename)
 				#img = file.filename
-				img = Image.open(BytesIO(img_path))
+				img = Image.open(BytesIO(file.filename))
 				res = pred(img)
 
 				#class_result , prob_result = predict(img_path , model)
