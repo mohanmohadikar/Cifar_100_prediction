@@ -32,6 +32,7 @@ from tensorflow.keras.preprocessing.image import load_img , img_to_array
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 model = load_model(os.path.join(BASE_DIR , 'ModelWebApp.hdf5'))
+model = load_model(os.path.join(BASE_DIR , 'cifar_100_cnn.hdf5'))
 #model = load_model("static/model.h5")
 #joblib_file = open("static/tokenizer.p", "rb")
 # Load from file
@@ -43,7 +44,29 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXT
 
-classes = ['airplane' ,'automobile', 'bird' , 'cat' , 'deer' ,'dog' ,'frog', 'horse' ,'ship' ,'truck']
+#classes = ['airplane' ,'automobile', 'bird' , 'cat' , 'deer' ,'dog' ,'frog', 'horse' ,'ship' ,'truck']
+classes = [
+		'beaver', 'dolphin', 'otter', 'seal', 'whale',
+		'aquarium fish', 'flatfish', 'ray', 'shark', 'trout',
+		'orchids', 'poppies', 'roses', 'sunflowers', 'tulips',
+		'bottles', 'bowls', 'cans', 'cups', 'plates',
+		'apples', 'mushrooms', 'oranges', 'pears', 'sweet peppers',
+		'clock', 'computer keyboard', 'lamp', 'telephone', 'television',
+		'bed', 'chair', 'couch', 'table', 'wardrobe',
+		'bee', 'beetle', 'butterfly', 'caterpillar', 'cockroach',
+		'bear', 'leopard', 'lion', 'tiger', 'wolf',
+		'bridge', 'castle', 'house', 'road', 'skyscraper',
+		'cloud', 'forest', 'mountain', 'plain', 'sea',
+		'camel', 'cattle', 'chimpanzee', 'elephant', 'kangaroo',
+		'fox', 'porcupine', 'possum', 'raccoon', 'skunk',
+		'crab', 'lobster', 'snail', 'spider', 'worm',
+		'baby', 'boy', 'girl', 'man', 'woman',
+		'crocodile', 'dinosaur', 'lizard', 'snake', 'turtle',
+		'hamster', 'mouse', 'rabbit', 'shrew', 'squirrel',
+		'maple', 'oak', 'palm', 'pine', 'willow',
+		'bicycle', 'bus', 'motorcycle', 'pickup' 'truck', 'train',
+		'lawn-mower', 'rocket', 'streetcar', 'tank', 'tractor'
+		]
 
 
 def predict(filename , model):
@@ -96,12 +119,12 @@ def success():
 				output.close()
 				img = filename
 
-				#res = pred(img_path)
+				res = pred(img_path)
 
 				#class_result , prob_result = predict(img_path , model)
 
 				predictions = {
-					  "class1":"res",
+					  "class1":res,
 					    "class2":"class_result[1]",
 					    "class3":"class_result[2]",
 					    "prob1": "prob_result[0]",
@@ -131,7 +154,7 @@ def success():
 				#class_result , prob_result = predict(img_path , model)
 			#really nigga.
 				predictions = {
-					  "class1":"res",
+					  "class1":res,
 					    "class2":"class_result[1]",
 					    "class3":"class_result[2]",
 					    "prob1": "prob_result[0]",
@@ -153,7 +176,30 @@ def success():
 
 
 
-
+# load and prepare the image
+def load_image(filename):
+	# load the image
+   img = filename.resize((32,32))
+	# convert to array
+   img = img_to_array(img)
+	# reshape into a single sample with 3 channels
+   img = img.reshape(1, 32, 32, 3)
+	# prepare pixel data
+   img = img.astype('float32')
+   img = img / 255.0
+   return img
+ 
+# load an image and predict the class
+def pred(img_file):
+	# load the image
+	img = load_image(img_file)
+	# load model
+	#model = load_model('final_model.h5')
+	# predict the class
+	result = model.predict_classes(img)
+	return classes[result[0]-1]
+ 
+)
 
 
 
