@@ -199,7 +199,7 @@ def pred(img_file):
 	result = model.predict_classes(img)
 	return classes[result[0]-1]
  
-)
+
 
 
 
