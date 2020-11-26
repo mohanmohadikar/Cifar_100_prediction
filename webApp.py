@@ -100,7 +100,8 @@ def predict(filename , model):
 
 @app.route('/')
 def home():
-		return render_template("index.html")
+	print("okkk")
+	return render_template("index.html")
 
 @app.route('/success' , methods = ['GET' , 'POST'])
 def success():
